@@ -1,0 +1,22 @@
+{
+  "name": "covid19",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "watch": "nodemon app.js -e '*'",
+    "serve": "node app.js"
+  },
+  "dependencies": {
+    "blob-stream": "^0.1.3",
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "express": "~4.16.1",
+    "http-errors": "~1.6.3",
+    "morgan": "~1.9.1",
+    "node-blob": "^0.0.2",
+    "node-fetch": "^2.6.1",
+    "nunjucks": "^3.2.2",
+    "pdf-lib": "^1.11.2",
+    "pdfkit": "^0.11.0"
+  }
+}
