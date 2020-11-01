@@ -3,6 +3,17 @@ const router = express.Router();
 const pdflib = require('pdf-lib');
 const fetch = require("node-fetch");
 const fs = require('fs');
+const QRCode = require('qrcode');
+
+function generateQR(text) {
+  const opts = {
+    errorCorrectionLevel: 'M',
+    type: 'image/png',
+    quality: 0.92,
+    margin: 1,
+  };
+  return QRCode.toDataURL(text, opts)
+}
 
 function getIdealFontSize (font, text, maxWidth, minSize, defaultSize) {
   let currentSize = defaultSize;
@@ -24,14 +35,16 @@ async function createDocument(profile) {
       .toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
       .replace(':', 'h');
   const data = [
-    `Cree le: ${creationDate} a ${creationHour}`,
+    `Cree le: ${creationDate} à ${creationHour}`,
     `Nom: ${profile.lastname}`,
     `Prenom: ${profile.firstname}`,
-    `Naissance: ${profile.birthday} a ${profile.place_of_birth}`,
+    `Naissance: ${profile.birthday} à ${profile.place_of_birth}`,
     `Adresse: ${profile.address} ${profile.zip} ${profile.city}`,
-    `Sortie: ${creationDate} a ${creationHour}`,
+    `Sortie: ${creationDate} à ${creationHour}`,
     `Motifs: ${profile.reason}`,
   ].join(';\n ');
+
+  console.log(data);
   const existingPdfBytes = await fetch("http://localhost:3000/pdf/certificate.pdf").then(res => res.arrayBuffer());
   const pdfDoc = await pdflib.PDFDocument.load(existingPdfBytes);
 
@@ -52,8 +65,11 @@ async function createDocument(profile) {
   };
 
   const drawText = (text, x, y, size = 11) => {
-    page1.drawText(text, { x, y, size, font })
+    page1.drawText(text, { x, y, size, font, color: pdflib.rgb(0.3, 0.3, 0.4) })
   };
+
+  const generatedQR = await generateQR(data);
+  const qrImage = await pdfDoc.embedPng(generatedQR);
 
   pdfDoc.setTitle('COVID-19 - Déclaration de déplacement');
   pdfDoc.setSubject('Attestation de déplacement dérogatoire');
@@ -85,6 +101,24 @@ async function createDocument(profile) {
   drawText(`${creationHour}`, 285, 215, 11);
 
   drawText(`${profile.firstname} ${profile.lastname}`, 150, 160, 20);
+
+  page1.drawImage(qrImage, {
+    x: page1.getWidth() - 156,
+    y: 150,
+    width: 92,
+    height: 92,
+  });
+
+  pdfDoc.addPage();
+
+  const page2 = pdfDoc.getPages()[1];
+  page2.drawImage(qrImage, {
+    x: 50,
+    y: page2.getHeight() - 350,
+    width: 300,
+    height: 300,
+  });
+
 
   fs.writeFileSync('./public/pdf/tmp_' + timestamp + '.pdf', await pdfDoc.save());
   return {
