@@ -53,15 +53,15 @@ async function createDocument(profile) {
   let locationSize = getIdealFontSize(font, profile.city, 83, 7, 11);
 
   const ys = {
-    travail: 585, // 578
-    achats: 536,
-    sante: 488,
-    famille: 451,
-    handicap: 414,
-    sport_animaux: 390,
-    convocation: 318,
-    missions: 293,
-    enfants: 269,
+    travail: 572,
+    achats: 523,
+    sante: 475,
+    famille: 438,
+    handicap: 402,
+    sport_animaux: 378,
+    convocation: 293,
+    missions: 256,
+    enfants: 232,
   };
 
   const drawText = (text, x, y, size = 11) => {
@@ -86,9 +86,10 @@ async function createDocument(profile) {
   pdfDoc.setCreator('');
   pdfDoc.setAuthor("Ministère de l'intérieur");
 
-  drawText(`${profile.firstname} ${profile.lastname}`, 119, 701);
-  drawText(profile.birthday + ' à ' + profile.place_of_birth, 135, 683);
-  drawText(`${profile.address} ${profile.zip} ${profile.city}`, 133, 664);
+  drawText(`${profile.firstname} ${profile.lastname}`, 119, 688);
+  drawText(profile.birthday, 120, 670);
+  drawText(profile.place_of_birth, 265, 670);
+  drawText(`${profile.address} ${profile.zip} ${profile.city}`, 133, 652);
 
   profile.reason
       .split(', ')
@@ -96,15 +97,15 @@ async function createDocument(profile) {
         drawText('x', 73, ys[profile.reason], 18)
       });
 
-  drawText(profile.city, 110, 233, locationSize);
-  drawText(`${creationDate}`, 91, 215, 11);
-  drawText(`${creationHour}`, 285, 215, 11);
+  drawText(profile.city, 110, 196, locationSize);
+  drawText(`${creationDate}`, 95, 178, 11);
+  drawText(`${creationHour}`, 285, 178, 11);
 
-  drawText(`${profile.firstname} ${profile.lastname}`, 150, 160, 20);
+  drawText(`${profile.firstname} ${profile.lastname}`, 150, 130, 20);
 
   page1.drawImage(qrImage, {
-    x: page1.getWidth() - 156,
-    y: 150,
+    x: page1.getWidth() - 215,
+    y: 100,
     width: 92,
     height: 92,
   });

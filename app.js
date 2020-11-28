@@ -6,7 +6,6 @@ const nunjucks = require('nunjucks');
 
 var indexRouter = require('./routes/index');
 
-
 var app = express();
 
 app.use(logger('dev'));
